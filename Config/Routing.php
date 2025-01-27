@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,12 +9,14 @@ declare(strict_types=1);
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace CodeIgniter\Config;
+namespace Config;
+
+use CodeIgniter\Config\Routing as BaseRouting;
 
 /**
  * Routing configuration
  */
-class Routing extends BaseConfig
+class Routing extends BaseRouting
 {
     /**
      * For Defined Routes.

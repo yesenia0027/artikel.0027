@@ -1,31 +1,23 @@
 <?php
 
-declare(strict_types=1);
+namespace Config;
 
-/**
- * This file is part of CodeIgniter 4 framework.
- *
- * (c) CodeIgniter Foundation <admin@codeigniter.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
-
-namespace CodeIgniter\Config;
-
+use CodeIgniter\Config\View as BaseView;
 use CodeIgniter\View\ViewDecoratorInterface;
 
 /**
- * View configuration
- *
  * @phpstan-type parser_callable (callable(mixed): mixed)
  * @phpstan-type parser_callable_string (callable(mixed): mixed)&string
  */
-class View extends BaseConfig
+class View extends BaseView
 {
     /**
      * When false, the view method will clear the data between each
-     * call.
+     * call. This keeps your data safe and ensures there is no accidental
+     * leaking between calls, so you would need to explicitly pass the data
+     * to each view. You might prefer to have the data stick around between
+     * calls so that it is available to all views. If that is the case,
+     * set $saveData to true.
      *
      * @var bool
      */
@@ -35,11 +27,12 @@ class View extends BaseConfig
      * Parser Filters map a filter name with any PHP callable. When the
      * Parser prepares a variable for display, it will chain it
      * through the filters in the order defined, inserting any parameters.
-     *
      * To prevent potential abuse, all filters MUST be defined here
      * in order for them to be available for use within the Parser.
      *
-     * @psalm-suppress UndefinedDocblockClass
+     * Examples:
+     *  { title|esc(js) }
+     *  { created_on|date(Y-m-d)|esc(attr) }
      *
      * @var         array<string, string>
      * @phpstan-var array<string, parser_callable_string>
@@ -51,65 +44,10 @@ class View extends BaseConfig
      * by the core Parser by creating aliases that will be replaced with
      * any callable. Can be single or tag pair.
      *
-     * @psalm-suppress UndefinedDocblockClass
-     *
      * @var         array<string, callable|list<string>|string>
      * @phpstan-var array<string, list<parser_callable_string>|parser_callable_string|parser_callable>
      */
     public $plugins = [];
-
-    /**
-     * Built-in View filters.
-     *
-     * @psalm-suppress UndefinedDocblockClass
-     *
-     * @var         array<string, string>
-     * @phpstan-var array<string, parser_callable_string>
-     */
-    protected $coreFilters = [
-        'abs'            => '\abs',
-        'capitalize'     => '\CodeIgniter\View\Filters::capitalize',
-        'date'           => '\CodeIgniter\View\Filters::date',
-        'date_modify'    => '\CodeIgniter\View\Filters::date_modify',
-        'default'        => '\CodeIgniter\View\Filters::default',
-        'esc'            => '\CodeIgniter\View\Filters::esc',
-        'excerpt'        => '\CodeIgniter\View\Filters::excerpt',
-        'highlight'      => '\CodeIgniter\View\Filters::highlight',
-        'highlight_code' => '\CodeIgniter\View\Filters::highlight_code',
-        'limit_words'    => '\CodeIgniter\View\Filters::limit_words',
-        'limit_chars'    => '\CodeIgniter\View\Filters::limit_chars',
-        'local_currency' => '\CodeIgniter\View\Filters::local_currency',
-        'local_number'   => '\CodeIgniter\View\Filters::local_number',
-        'lower'          => '\strtolower',
-        'nl2br'          => '\CodeIgniter\View\Filters::nl2br',
-        'number_format'  => '\number_format',
-        'prose'          => '\CodeIgniter\View\Filters::prose',
-        'round'          => '\CodeIgniter\View\Filters::round',
-        'strip_tags'     => '\strip_tags',
-        'title'          => '\CodeIgniter\View\Filters::title',
-        'upper'          => '\strtoupper',
-    ];
-
-    /**
-     * Built-in View plugins.
-     *
-     * @psalm-suppress UndefinedDocblockClass
-     *
-     * @var         array<string, callable|list<string>|string>
-     * @phpstan-var array<string, array<parser_callable_string>|parser_callable_string|parser_callable>
-     */
-    protected $corePlugins = [
-        'csp_script_nonce'  => '\CodeIgniter\View\Plugins::cspScriptNonce',
-        'csp_style_nonce'   => '\CodeIgniter\View\Plugins::cspStyleNonce',
-        'current_url'       => '\CodeIgniter\View\Plugins::currentURL',
-        'previous_url'      => '\CodeIgniter\View\Plugins::previousURL',
-        'mailto'            => '\CodeIgniter\View\Plugins::mailto',
-        'safe_mailto'       => '\CodeIgniter\View\Plugins::safeMailto',
-        'lang'              => '\CodeIgniter\View\Plugins::lang',
-        'validation_errors' => '\CodeIgniter\View\Plugins::validationErrors',
-        'route'             => '\CodeIgniter\View\Plugins::route',
-        'siteURL'           => '\CodeIgniter\View\Plugins::siteURL',
-    ];
 
     /**
      * View Decorators are class methods that will be run in sequence to
@@ -121,16 +59,4 @@ class View extends BaseConfig
      * @var list<class-string<ViewDecoratorInterface>>
      */
     public array $decorators = [];
-
-    /**
-     * Merge the built-in and developer-configured filters and plugins,
-     * with preference to the developer ones.
-     */
-    public function __construct()
-    {
-        $this->filters = array_merge($this->coreFilters, $this->filters);
-        $this->plugins = array_merge($this->corePlugins, $this->plugins);
-
-        parent::__construct();
-    }
 }
